@@ -40,6 +40,24 @@ sampleAlbums.push({
 $(document).ready(function() {
   console.log('app.js loaded!');
 
+  $.get("/api/albums", function(albums){
+    console.log("heres my albums")
+    albums.forEach(function(oneAlbum){
+      renderAlbum(oneAlbum);
+    })
+    console.log(albums);
+  });
+
+  $('#album-form form').submit (function(event){
+      event.preventDefault();
+      var formdata = $(this).serialize();
+      console.log($(this));
+      $.post('/api/albums', formdata, function(album){
+        renderAlbum(album);
+      });
+      $(this).trigger('reset');
+  });
+
 });
 
 
@@ -52,7 +70,7 @@ function renderAlbum(album) {
 
   var albumHtml =
   "        <!-- one album -->" +
-  "        <div class='row album' data-album-id='" + "HARDCODED ALBUM ID" + "'>" +
+  "        <div class='row album' data-album-id='" + "HARDCODED ALBUM RELEASE" + "'>" +
   "          <div class='col-md-10 col-md-offset-1'>" +
   "              <!-- begin album internal row -->" +
   "                <div class='row'>" +
@@ -63,16 +81,16 @@ function renderAlbum(album) {
   "                    <ul class='list-group'>" +
   "                      <li class='list-group-item'>" +
   "                        <h4 class='inline-header'>Album Name:</h4>" +
-  "                        <span class='album-name'>" + "HARDCODED ALBUM NAME" + "</span>" +
+  "                        <span class='album-name'>" + album.name + "</span>" +
   "                      </li>" +
   "                      <li class='list-group-item'>" +
   "                        <h4 class='inline-header'>Artist Name:</h4>" +
-  "                        <span class='artist-name'>" +  "HARDCODED ARTIST NAME"+ "</span>" +
+  "                        <span class='artist-name'>" + album.artistName+ "</span>" +
   "                      </li>" +
   "                      <li class='list-group-item'>" +
   "                        <h4 class='inline-header'>Released date:</h4>" +
-  "                        <span class='album-releaseDate'>" + "HARDCODED ALBUM RELEASE" + "</span>" +
-  "                      </li>" +
+  "                        <span class='album-releaseDate'>" + album.releaseDate + "</span>" +
+  "                      </li>" + buildSongsHtml(album.songs);
   "                    </ul>" +
   "                  </div>" +
   "                </div>" +
@@ -81,5 +99,23 @@ function renderAlbum(album) {
   "          <!-- end one album -->";
 
   // render to the page with jQuery
+$("#albums").append(albumHtml);
+}
+
+function buildSongsHtml(songs) {
+
+    var songText = ""; 
+
+    songs.forEach(function(song){ 
+      songText = songText + "(" + song.trackNumber + ") " + song.name + " - "; 
+    }); 
+
+    var songsHtml =  
+    "   <li class='list-group-item'> " +
+    "   <h4 class='inline-header'>Songs:</h4> " + songText +
+    "   </li> "
+    
+    return songsHtml; 
 
 }
+
